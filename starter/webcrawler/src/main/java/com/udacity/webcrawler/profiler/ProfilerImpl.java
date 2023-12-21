@@ -1,11 +1,15 @@
 package com.udacity.webcrawler.profiler;
 
 import javax.inject.Inject;
+
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.time.Clock;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -30,27 +34,30 @@ final class ProfilerImpl implements Profiler {
     this.startTime = ZonedDateTime.now(clock);
   }
   
-  private Boolean profiledClass(Class<?> klass) {
-	    List<Method> methods = new ArrayList<>(Arrays.asList(klass.getDeclaredMethods()));
 
-	    if (methods.isEmpty()) {
-	      return false;
-	    }
-	    return methods.stream().anyMatch(x -> x.getAnnotation(Profiled.class) != null);
-	  }
-  @Override
-  public <T> T wrap(Class<T> klass, T delegate) {
+
+@Override
+  public <T> T wrap(Class<T> klass, T delegate){
     Objects.requireNonNull(klass);
 
     // TODO: Use a dynamic proxy (java.lang.reflect.Proxy) to "wrap" the delegate in a
     //       ProfilingMethodInterceptor and return a dynamic proxy from this method.
     //       See https://docs.oracle.com/javase/10/docs/api/java/lang/reflect/Proxy.html.
-    if (!profiledClass(klass)) {
-        throw new IllegalArgumentException(klass.getName() + "this klass is null");
-      }
+
+    List<Method> methods = new ArrayList<>(Arrays.asList(klass.getDeclaredMethods()));
+    
+    if(methods.isEmpty()) {
+    	throw new IllegalArgumentException(klass.getName() + "this klass has not element");
+    }
+    
+    if( methods.stream().noneMatch(x -> x.getAnnotation(Profiled.class) != null)) {
+    	throw new IllegalArgumentException(klass.getName() + "this klass equals null");
+    }
+	
+    
     ProfilingMethodInterceptor interceptor = new ProfilingMethodInterceptor(clock, delegate, state, startTime);
 
-    Object proxy = Proxy.newProxyInstance(
+    T proxy = (T) Proxy.newProxyInstance(
             ProfilerImpl.class.getClassLoader(),
             new Class[]{klass},
             interceptor
@@ -60,9 +67,14 @@ final class ProfilerImpl implements Profiler {
   }
 
   @Override
-  public void writeData(Path path) {
+  public void writeData(Path path) throws IOException{
     // TODO: Write the ProfilingState data to the given file path. If a file already exists at that
     //       path, the new data should be appended to the existing file.
+	  Objects.requireNonNull(path);
+//	  writer writer = Files.newBufferedWriter(path, StandardOpenOption.CREATE, StandardOpenOption.APPEND)
+      try ( FileWriter fileToWrite = new FileWriter(path.toFile(),true)) {
+          writeData(fileToWrite);
+      } 
   }
 
   @Override
