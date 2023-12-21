@@ -7,6 +7,7 @@ import java.io.Reader;
 import java.nio.file.Path;
 import java.util.Objects;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -15,7 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public final class ConfigurationLoader {
 
   private final Path path;
-
+  static ObjectMapper objectMapper = new ObjectMapper();
   /**
    * Create a {@link ConfigurationLoader} that loads configuration from the given {@link Path}.
    */
@@ -47,14 +48,15 @@ public final class ConfigurationLoader {
    */
   public static CrawlerConfiguration read(Reader reader) {
     // This is here to get rid of the unused variable warning.
-	  Objects.requireNonNull(reader);
-      ObjectMapper objectMapper = new ObjectMapper();
-      objectMapper.disable(com.fasterxml.jackson.core.JsonParser.Feature.AUTO_CLOSE_SOURCE);
+//	  Objects.requireNonNull(reader);
+      objectMapper.disable(JsonParser.Feature.AUTO_CLOSE_SOURCE);
+      
       try {
-          return objectMapper.readValue(reader, CrawlerConfiguration.class);
+          CrawlerConfiguration crawlerConfig = objectMapper.readValue(Objects.requireNonNull(reader), CrawlerConfiguration.Builder.class).build();
+          return crawlerConfig;
       } catch (IOException e) {
           e.printStackTrace();
-          return new CrawlerConfiguration.Builder().build();
+          return null;
       }
   }
 }

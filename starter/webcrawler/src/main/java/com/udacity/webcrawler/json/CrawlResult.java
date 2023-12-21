@@ -66,6 +66,7 @@ public final class CrawlResult {
   public static final class Builder {
     private Map<String, Integer> wordFrequencies = new HashMap<>();
     private int pageCount;
+    
     private Collection<String> urlsFail = new HashSet<>();
     
     public Builder setUrlsFailure(Collection<String> urlFail) {
