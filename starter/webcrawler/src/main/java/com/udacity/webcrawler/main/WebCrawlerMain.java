@@ -31,7 +31,7 @@ public final class WebCrawlerMain {
   }
 
   @Inject
-  private static WebCrawler crawler;
+  private WebCrawler crawler;
 
   @Inject
   private Profiler profiler;
@@ -62,21 +62,18 @@ public final class WebCrawlerMain {
   }
 
   public static void main(String[] args) throws Exception {
+	  CrawlerConfiguration config = new ConfigurationLoader(Path.of(args[0])).load();
+	    System.out.println(config.toString());
+	    new WebCrawlerMain(config).run();
+	    
     if (args.length != 1) {
       System.out.println("Usage: WebCrawlerMain [starting-url]");
       return;
     }
-//    CrawlerConfiguration config =
-//	    new CrawlerConfiguration.Builder()
-//	        .setImplementationOverride("com.udacity.webcrawler.ParallelWebCrawler")
-//	        .setMaxDepth(10)
-//	        .setPopularWordCount(3)
-//	        .build();
-//    CrawlResult result = crawler.crawl(config.getStartPages());
-//    System.out.println("Result : " + result.toString());
-    CrawlerConfiguration config = new ConfigurationLoader(Path.of(args[0])).load();
-    new WebCrawlerMain(config).run();
-    
+//    CrawlerConfiguration config = new ConfigurationLoader(Path.of(args[0])).load();
+//    System.out.println(config.toString());
+//    new WebCrawlerMain(config).run();
+//    
     
     
   }
