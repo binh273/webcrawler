@@ -71,8 +71,8 @@ final class ProfilerImpl implements Profiler {
     // TODO: Write the ProfilingState data to the given file path. If a file already exists at that
     //       path, the new data should be appended to the existing file.
 	  Objects.requireNonNull(path);
-//	  writer writer = Files.newBufferedWriter(path, StandardOpenOption.CREATE, StandardOpenOption.APPEND)
-      try ( FileWriter fileToWrite = new FileWriter(path.toFile(),true)) {
+
+      try ( Writer fileToWrite = Files.newBufferedWriter(path, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
           writeData(fileToWrite);
       } 
   }
