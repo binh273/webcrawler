@@ -137,12 +137,7 @@ public class CrawlerRecursiveAction extends RecursiveAction {
 			return ;
 		}
 
-		if(ignoredUrls.stream().anyMatch(pattern -> pattern.matcher(url).matches()))
-		{
-			return ;
-		}
-		
-		if(visitedUrls.contains(url))
+		if(ignoredUrls.stream().anyMatch(pattern -> pattern.matcher(url).matches()) || visitedUrls.contains(url))
 		{
 			return ;
 		}

@@ -49,8 +49,9 @@ public final class WebCrawlerMain {
     } else {
         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(System.out);
         profiler.writeData(outputStreamWriter);
+        outputStreamWriter.flush();
     }
-
+    
     String checkResultPath = config.getResultPath();
     if (!checkResultPath.isEmpty()) {
         Path resultPath = Paths.get(checkResultPath);
@@ -58,13 +59,11 @@ public final class WebCrawlerMain {
     } else {
         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(System.out);
         resultWriter.write(outputStreamWriter);
+        outputStreamWriter.flush();
     }
   }
 
   public static void main(String[] args) throws Exception {
-	  CrawlerConfiguration config = new ConfigurationLoader(Path.of(args[0])).load();
-	    System.out.println(config.toString());
-	    new WebCrawlerMain(config).run();
 	    
     if (args.length != 1) {
       System.out.println("Usage: WebCrawlerMain [starting-url]");
@@ -75,6 +74,8 @@ public final class WebCrawlerMain {
 //    new WebCrawlerMain(config).run();
 //    
     
-    
+	  CrawlerConfiguration config = new ConfigurationLoader(Path.of(args[0])).load();
+	    System.out.println(config.toString());
+	    new WebCrawlerMain(config).run();
   }
 }

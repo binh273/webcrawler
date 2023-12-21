@@ -36,6 +36,7 @@ final class ProfilerImpl implements Profiler {
   
 
 
+@SuppressWarnings("unchecked")
 @Override
   public <T> T wrap(Class<T> klass, T delegate){
     Objects.requireNonNull(klass);
@@ -57,7 +58,7 @@ final class ProfilerImpl implements Profiler {
     
     ProfilingMethodInterceptor interceptor = new ProfilingMethodInterceptor(clock, delegate, state, startTime);
 
-    T proxy = (T) Proxy.newProxyInstance(
+	T proxy = (T) Proxy.newProxyInstance(
             ProfilerImpl.class.getClassLoader(),
             new Class[]{klass},
             interceptor
@@ -74,7 +75,10 @@ final class ProfilerImpl implements Profiler {
 
       try ( Writer fileToWrite = Files.newBufferedWriter(path, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
           writeData(fileToWrite);
-      } 
+      } catch (Exception e) {
+		// TODO: handle exception
+    	  e.printStackTrace();
+	}
   }
 
   @Override
