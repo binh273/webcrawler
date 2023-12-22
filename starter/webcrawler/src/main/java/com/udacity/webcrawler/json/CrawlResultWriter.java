@@ -56,7 +56,7 @@ public final class CrawlResultWriter {
     Objects.requireNonNull(writer);
     objectMapper.disable(JsonGenerator.Feature.AUTO_CLOSE_TARGET);
     try {
-        objectMapper.writeValue(writer, result);
+        objectMapper.writerWithDefaultPrettyPrinter().writeValue(writer, result);
     } catch (IOException e) {
         e.printStackTrace();
     }
