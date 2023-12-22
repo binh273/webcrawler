@@ -14,6 +14,8 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Pattern;
 
 import com.udacity.webcrawler.parser.PageParser;
@@ -29,6 +31,8 @@ public class CrawlerRecursiveAction extends RecursiveAction {
     private int maxDepth;
     private ConcurrentMap<String, Integer> counts;
     private ConcurrentSkipListSet<String> visitedUrls;
+    
+    public static Lock lockParallel = new ReentrantLock();
     
     public CrawlerRecursiveAction(String url,
     							   Instant deadline,
@@ -137,12 +141,24 @@ public class CrawlerRecursiveAction extends RecursiveAction {
 			return ;
 		}
 
-		if(ignoredUrls.stream().anyMatch(pattern -> pattern.matcher(url).matches()) || visitedUrls.contains(url))
+		if(ignoredUrls.stream().anyMatch(pattern -> pattern.matcher(url).matches()))
 		{
 			return ;
 		}
+		try {
+			lockParallel.lock();
+			if(visitedUrls.contains(url)) {
+				return ;
+			} 
+			}catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+			}
+			finally {
+				lockParallel.unlock();
+			}
+			visitedUrls.add(url);
 		// If not return null add url and getLink() create subtasks
-		visitedUrls.add(url);
 		
 		PageParser.Result result = parserFactory.get(url).parse();
 		
